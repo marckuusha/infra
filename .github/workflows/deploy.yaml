@@ -26,6 +26,7 @@ jobs:
           echo "$DEPLOY_SSH_KEY" > deploy_key.pem
           chmod 600 deploy_key.pem
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} 'bash -s' < ./create-network.sh
+          cat ./docker-compose-psql.yaml | -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} 'docker-compose -f - up -d'
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
 
