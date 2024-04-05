@@ -32,7 +32,7 @@ jobs:
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} 'bash -s' < ./create-network.sh
           rsync -avz -e 'ssh -i deploy_key.pem -o StrictHostKeyChecking=no' ./docker-compose-psql.yaml ${{ env.HOST }}:${{ env.DEPLOY_DIRECTORY }}
 
-          ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "export POSTGRES_PASSWORD=${{env.POSTGRES_PASSWORD}} \ docker-compose -p psql -f ${{env.DEPLOY_DIRECTORY}}/docker-compose-psql.yaml up -d"
+          ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "docker-compose -p psql -f ${{env.DEPLOY_DIRECTORY}}/docker-compose-psql.yaml up -d"
 
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
