@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       HOST: root@46.161.52.147
+      DEPLOY_DIRECTORY: /root/app/configs
 
     steps:
       - name: Checkout code
@@ -25,10 +26,17 @@ jobs:
           sudo apt-get install -y ssh rsync
           echo "$DEPLOY_SSH_KEY" > deploy_key.pem
           chmod 600 deploy_key.pem
+          ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "mkdir -p ${{ env.DEPLOY_DIRECTORY }}"
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} 'bash -s' < ./create-network.sh
-          cat ./docker-compose-psql.yaml | -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} 'docker-compose -f - up -d'
+          rsync -avz -e 'ssh -i deploy_key.pem -o StrictHostKeyChecking=no' ./docker-compose-psql.yaml ${{ env.HOST }}:${{ env.DEPLOY_DIRECTORY }}
+
+
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+
+
+          # ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} 'bash -s' < ./create-network.sh
+          # cat ./docker-compose-psql.yaml | -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} 'docker-compose -f - up -d'
 
       # - name: Run external script
       #   run: |
